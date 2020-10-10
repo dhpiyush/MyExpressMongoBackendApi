@@ -3,10 +3,33 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
+const address = new mongoose.Schema({
+        name: String,
+        uuid: String,
+        addressLine1: String,
+        addressLine2: String,
+        addressLine3: String,
+        houseNumber: String,
+        street: String,
+        city: String,
+        pincode: Number,
+        primaryPhone: Number,
+        secondaryPhone: Number,
+        mobilePhone: Number,
+        geo: {
+            lat: Number,
+            long: Number
+        }
+    });
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'Please tell us your name!']
+    },
+    title: {
+        type: String,
+        enum: ['Mr', 'Ms', 'Mrs'],
+        default: 'Mr'
     },
     email:{
         type: String,
@@ -45,7 +68,9 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
         select: false
-    }
+    },
+    address: address,
+    allAddresses: [address]
 });
 
 // userSchema.index({email: 1, name: -1}); // indexing is used based on apps data access pattern. Helps to search and respond faster

@@ -1,4 +1,4 @@
-const AppError = require('../../utils/appError');
+import {AppError} from '../../utils';
 
 const handleCastErrorDB = err => {
     const message = `Invalid ${err.path}: ${err.value}.`
@@ -6,15 +6,20 @@ const handleCastErrorDB = err => {
 }
 
 const handleDuplicateFields = err => {
-    const value = err.errmsg.match(/(["'])(\\?.)*?\1/);
+    const value = err.message.match(/(["'])(\\?.)*?\1/);
     const message = `Duplicate field value: ${value}. Please use another value`;
     return new AppError(message, 400)
 }
 
 const handleValidationErrorDB = err =>{
-    const errors = Object.values(err.errors).map(el => el.message)
+    const errors = Object.values(err.errors).map(el => el.message);
     const message = `Invalid input data ${errors.join('. ')}`;
     return new AppError(message, 400);
+}
+
+const handleJWTError = err =>{
+    const message = 'Token not valid';
+    return new AppError(message, 401)
 }
 
 const sendErrorDev = (err, req, res) => {
@@ -97,6 +102,20 @@ module.exports = (err, req, res, next) => {
         // Error for duplicate data fields
         if (error.code === 11000) error = handleDuplicateFields(error);
         if (error.name === 'ValidationError') error = handleValidationErrorDB(error);
+        if (error.name === 'JsonWebTokenError') error = handleJWTError(error);
+        if (error.errors) {
+            const values = Object.values(error.errors);
+            let isValidationError = false
+            for(let index in values){
+                if (values[index].name === 'ValidatorError') {
+                    isValidationError = true;
+                    break;
+                }
+            }
+            if(isValidationError){
+                error = handleValidationErrorDB(error);
+            }
+        }
 
         sendErrorProd(error, req, res);
     }

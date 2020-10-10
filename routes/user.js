@@ -27,8 +27,14 @@ router.post('/updatePassword', authController.updatePassword); //user must be lo
 // router.patch('/updateMyPaswword', authController.updatePassword);
 router.post('/profile/update/me', userController.updateMe, userController.updateUser);
 // router.delete('/deleteMe', userController.deleteMe);
-router.get('/profile/me', userController.getMe, userController.getUser);
+router.get('/profile/me', userController.getUser);
 router.get('/all', authController.restrictTo('admin'), userController.getAllUsers);
+router.put('/address/add/current', userController.addCurrentAddress);
+router.put('/address/add/addresses', userController.addAddress);
+router.put('/address/update', userController.updateAddress);
+router.get('/address/all', userController.getAllAddresses);
+router.delete('/address/delete', userController.deleteAddress);
+router.get('/address/current', userController.getCurrentAddress);
     
 module.exports = router;
 
