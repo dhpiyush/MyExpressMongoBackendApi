@@ -1,30 +1,31 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const path = require('path');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
+const express = require("express");
+const mongoose = require("mongoose");
+const path = require("path");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
 const app = express();
 const router = express.Router();
-const config = require('config');
-const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
-const xss = require('xss-clean');
-const compression = require('compression');
-const hpp = require('hpp');
-const routes = require('./routes');
-const globalErrorHandler = require('./controllers/error');
-import {AppError} from './utils';
-const API_PORT = config.get('api-port');
+const config = require("config");
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
+const compression = require("compression");
+const hpp = require("hpp");
+const routes = require("./routes");
+const globalErrorHandler = require("./controllers/error");
+import { AppError } from "./utils";
+const API_PORT = config.get("api-port");
 
-const DB =  "mongodb+srv://m001-student:m001-mongodb-basics@sandbox.wxjro.mongodb.net/video?retryWrites=true&w=majority";
+const DB =
+  "mongodb+srv://m001-student:m001-mongodb-basics@sandbox.wxjro.mongodb.net/video?retryWrites=true&w=majority";
 mongoose.connect(DB, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: true,
-    useUnifiedTopology: true
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
 });
 let db = mongoose.connection;
 
@@ -33,15 +34,14 @@ db.once("open", () => console.log("connected to the database"));
 // checks if connection with the database is successful
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
-
 // used to enable headers set by heroku req.headers('x-forwaded-proto') === 'https
 // app.enable('trust proxy');
 
 //in production we should have a tool in place which will restart the application after crashing and many hosting services do so
-process.on('uncaughtRejection', err => {
-    console.log(err.name, err.message);
-    console.log('uncaughtRejection , shutting down');
-    process.exit(1);
+process.on("uncaughtRejection", (err) => {
+  console.log(err.name, err.message);
+  console.log("uncaughtRejection , shutting down");
+  process.exit(1);
 });
 
 //set security HTTP headers
@@ -55,12 +55,12 @@ app.use(helmet());
 //rate limits request based on IP
 // limit requests from same API
 const limiter = rateLimit({
-    max: 100,
-    windowMs: 60*60*1000, // 100 requests in 1hr
-    message: 'To many requests from this IP, please try again in an hour'
+  max: 100,
+  windowMs: 60 * 60 * 1000, // 100 requests in 1hr
+  message: "To many requests from this IP, please try again in an hour",
 });
 //status code 429
-app.use('/api', limiter);
+app.use("/api", limiter);
 
 //if frontend website is hosted on example.com then allow only to it to make call
 //otherwise app.use(cors()); to allow api access from anywhere
@@ -96,52 +96,54 @@ app.use(xss());
 // to test: body = {"name": "<div>sajdksjdk</div>"}
 
 //Prevent parameter pollution
-app.use(hpp({
-    whitelist: ['duration'] // it will allow duration to be duplicate
-}));
+app.use(
+  hpp({
+    whitelist: ["duration"], // it will allow duration to be duplicate
+  })
+);
 // this will remove duplicate parameters in query string eg: v1/tours?sort=duration&sort=price so it will sort by price
 
 // app.use((req,res,next) => {
 //     console.log('hello');
 //     next();
 // });
-app.use('/api', routes); 
+app.use("/api", routes);
 
 app.use(compression()); // compress all the text sent to client i.e text or json
 
 // append /api for our http requests
 // app.use("/api/v1/users", dataRouter);
 
-app.all('*', (req, res, next) => {
-    
-    // res.status(404).json({
-    //     status: 'fail',
-    //     message: `Cant find ${req.originalUrl} on this server`
-    // });
-    //instead of this we are doing 
-    console.log('all');
-    next(new AppError(`Cant find ${req.originalUrl} on this server`, 404));
+app.all("*", (req, res, next) => {
+  // res.status(404).json({
+  //     status: 'fail',
+  //     message: `Cant find ${req.originalUrl} on this server`
+  // });
+  //instead of this we are doing
+  console.log("all");
+  next(new AppError(`Cant find ${req.originalUrl} on this server`, 404));
 });
 app.use(globalErrorHandler);
-app.on('error', (err) => console.error(err));
+app.on("error", (err) => console.error(err));
 
 // launch our backend into a port
-const server = app.listen(API_PORT, () => console.log(`Listening on Port ${API_PORT}`));
+const server = app.listen(API_PORT, () =>
+  console.log(`Listening on Port ${API_PORT}`)
+);
 
 //errors occuring outside express like connecting to mongoose
-process.on('unhandledRejection', err => {
-    console.log(err.name, err.message);
-    console.log('unhandledRejection , shutting down');
-    server.close(()=>{
-        process.exit(1);
-    });
+process.on("unhandledRejection", (err) => {
+  console.log(err.name, err.message);
+  console.log("unhandledRejection , shutting down");
+  server.close(() => {
+    process.exit(1);
+  });
 });
 
-
-process.on('SIGTERM', ()=> {
-    console.log('SIGTERM RECEIVED, shutting down gracefully ');
-    //sigterm will automatically shutdown application so we dont need to do process.exit(1)
-    server.close(()=>{
-        console.log('Process terminated');
-    });
+process.on("SIGTERM", () => {
+  console.log("SIGTERM RECEIVED, shutting down gracefully ");
+  //sigterm will automatically shutdown application so we dont need to do process.exit(1)
+  server.close(() => {
+    console.log("Process terminated");
+  });
 });

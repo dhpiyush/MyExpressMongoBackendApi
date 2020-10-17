@@ -1,4 +1,4 @@
-import {AppError, catchAsync} from '../../utils';
+import { AppError, catchAsync } from "../../utils";
 
 //https://mongoosejs.com/docs/queries.html
 
@@ -15,26 +15,28 @@ import {AppError, catchAsync} from '../../utils';
 //     })
 // });
 
-exports.updateOne = (Model, fieldsToReturn) => catchAsync(async (req, res, next) => {
-    const fields = fieldsToReturn && fieldsToReturn.join(' ');
+exports.updateOne = (Model, fieldsToReturn, keyName) =>
+  catchAsync(async (req, res, next) => {
+    const fields = fieldsToReturn && fieldsToReturn.join(" ");
     //update user document
     const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
-        new: true, // returns new object
-        runValidators: true, // if we put invalid email address then we need mongoose to validate
-        select: fields
+      new: true, // returns new object
+      runValidators: true, // if we put invalid email address then we need mongoose to validate
+      select: fields,
     });
 
     if (!doc) {
-        return next(new AppError('No doc found with that ID', 404));
+      return next(new AppError("No doc found with that ID", 404));
     }
 
+    const data = {};
+    data[keyName] = doc;
+
     res.status(200).json({
-        status: 'success',
-        data: {
-            user: doc
-        }
+      status: "success",
+      data,
     });
-});
+  });
 
 // exports.createOne = Model => catchAsync(async (req, res, next) => {
 //     //update user document
@@ -65,13 +67,14 @@ exports.updateOne = (Model, fieldsToReturn) => catchAsync(async (req, res, next)
 // };
 
 // We can also use this directly and use exports.getUser = factory.getOne(User); in the user/index.js file
-exports.getOne = (Model, fieldsToReturn, popOptions) => catchAsync(async (req, res, next) => {
-    const fields = fieldsToReturn && fieldsToReturn.join(' ');
+exports.getOne = (Model, fieldsToReturn, popOptions) =>
+  catchAsync(async (req, res, next) => {
+    const fields = fieldsToReturn && fieldsToReturn.join(" ");
     //get user document
     let query = await Model.findById(req.params.id, fields);
 
     if (popOptions) {
-        query = query.populate(popOptions);
+      query = query.populate(popOptions);
     }
     const doc = await query;
 
@@ -79,28 +82,29 @@ exports.getOne = (Model, fieldsToReturn, popOptions) => catchAsync(async (req, r
     // (fieldsToReturn || []).forEach(field => user[field] = doc[field]);
 
     res.status(201).json({
-        status: 'success',
-        data:{
-            user: doc
-        }
+      status: "success",
+      data: {
+        user: doc,
+      },
     });
-});
+  });
 
-exports.getAll = (Model, fieldsToReturn) => catchAsync(async (req, res, next) => {
+exports.getAll = (Model, fieldsToReturn, keyName) =>
+  catchAsync(async (req, res, next) => {
     // const features = new APIFeatures(Model.find(), req.query)
     //     .filter()
     //     .sort()
     //     .limitFields()
     //     .paginate()
     const fieldsToReturnFromDoc = {};
-    (fieldsToReturn || []).map(field => fieldsToReturnFromDoc[field] = 1);
+    (fieldsToReturn || []).map((field) => (fieldsToReturnFromDoc[field] = 1));
     const doc = await Model.find({}, fieldsToReturnFromDoc);
-    
+
+    const data = {};
+    data[keyName] = doc;
     res.status(200).json({
-        status: 'success',
-        results: doc.length,
-        data: {
-            users: doc
-        }
+      status: "success",
+      results: doc.length,
+      data,
     });
-});
+  });

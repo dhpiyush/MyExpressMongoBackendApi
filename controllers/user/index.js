@@ -1,12 +1,12 @@
-export {getMe, getUser} from './get-user';
-export {updateMe, updateUser} from './update-user';
-export {getAllUsers} from './get-all-users';
-export {addCurrentAddress} from './address/add-current-address';
-export {addAddress} from './address/add-address';
-export {updateAddress} from './address/update-address';
-export {getAllAddresses} from './address/get-all-addresses';
-export {deleteAddress} from './address/delete-address';
-export {getCurrentAddress} from './address/get-current-address';
+export { getMe, getUser } from "./get-user";
+export { updateMe, updateUser } from "./update-user";
+export { getAllUsers } from "./get-all-users";
+export { addCurrentAddress } from "./address/add-current-address";
+export { addAddress } from "./address/add-address";
+export { updateAddress } from "./address/update-address";
+export { getAllAddresses } from "./address/get-all-addresses";
+export { deleteAddress } from "./address/delete-address";
+export { getCurrentAddress } from "./address/get-current-address";
 
 // exports.deleteMe = catchAsync(async (req, res, next) => {
 //     //this active is set to false and not actually the user is deleted
@@ -33,5 +33,3 @@ export {getCurrentAddress} from './address/get-current-address';
 //         }
 //     });
 // });
-
-
