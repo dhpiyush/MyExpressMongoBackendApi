@@ -41,7 +41,7 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
       resetUrl,
     });
   } catch (error) {
-    console.log("error");
+    console.log("errorrrr", error);
     // expire reset token
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;

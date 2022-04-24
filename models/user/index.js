@@ -21,6 +21,7 @@ const address = new mongoose.Schema({
     long: Number,
   },
 });
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
