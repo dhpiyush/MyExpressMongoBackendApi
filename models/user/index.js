@@ -21,6 +21,7 @@ const address = new mongoose.Schema({
     long: Number,
   },
 });
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -42,7 +43,7 @@ const userSchema = new mongoose.Schema({
   photo: String,
   role: {
     type: String,
-    enum: ["user", "admin", "lead"],
+    enum: ["user", "admin", "seller"],
     default: "user",
   },
   password: {

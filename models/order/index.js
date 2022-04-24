@@ -24,7 +24,9 @@ const orderSchema = new mongoose.Schema({
   },
   products: [
     {
+      name: String,
       description: String,
+      sellerId: String,
       productId: {
         type: mongoose.Schema.ObjectId,
         ref: "Product",
@@ -73,12 +75,6 @@ const orderSchema = new mongoose.Schema({
     default: getIndiaDateTime(),
   },
 });
-
-// orderSchema.pre("findByIdAndUpdate", function (next) {
-//   this.updatedAt = new Date();
-//   console.log("this.updatedAt", this.updatedAt);
-//   next();
-// });
 
 const Order = mongoose.model("Order", orderSchema); //name of the model and the schema
 
